@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ spec.title }} – ChemEng Toolkit{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>{{ spec.title }}</h2>
+    <p>{{ spec.description }}</p>
+  </div>
+  <div class="meta">{{ spec.category }}</div>
+</div>
+
+<div class="calc-grid">
+  <form id="calcForm" class="card calc-form" data-calc-id="{{ calc_id }}">
+    {% for inp in spec.inputs %}
+      <div class="field">
+        <label for="{{ inp.name }}">
+          {{ inp.label }}{% if inp.unit %} <span class="unit">[{{ inp.unit }}]</span>{% endif %}
+        </label>
+        {% if inp.type == 'select' %}
+          <select id="{{ inp.name }}" name="{{ inp.name }}">
+            {% for opt in inp.options %}
+              <option value="{{ opt }}" {% if opt == inp.default %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+        {% elif inp.type == 'textarea' %}
+          <textarea id="{{ inp.name }}" name="{{ inp.name }}" rows="4">{{ inp.default }}</textarea>
+        {% elif inp.type == 'text' %}
+          <input id="{{ inp.name }}" name="{{ inp.name }}" type="text" value="{{ inp.default }}">
+        {% else %}
+          <input id="{{ inp.name }}" name="{{ inp.name }}" type="number" step="any" value="{{ inp.default }}">
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit">Calculate</button>
+    <button type="button" id="downloadPdf" class="secondary">Download PDF Report</button>
+  </form>
+
+  <div id="resultBox" class="card result">
+    <h3>Results</h3>
+    <p class="muted" id="resultPlaceholder">Submit the form to see results.</p>
+    <div id="resultDiagram" class="diagram" hidden></div>
+    <table class="data" id="resultTable" hidden>
+      <thead><tr><th>Quantity</th><th>Value</th><th>Unit</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="resultDatasheet" class="datasheet" hidden></div>
+    <div id="resultCharts" class="charts" hidden></div>
+    <div id="resultNotes" class="notes"></div>
+    <div id="resultError" class="error" hidden></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}ChemEng Toolkit – Home{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>ChemEng Toolkit</h2>
+    <p>A Flask-based collection of chemical engineering calculators with an AI assistant.</p>
+  </div>
+  <div class="meta">{{ groups | length }} categories</div>
+</div>
+
+<div class="cat-grid">
+  {% for cat, items in groups %}
+    <div class="card">
+      <h3>{{ cat }}</h3>
+      <ul class="calc-list">
+        {% for cid, spec in items %}
+          <li><a href="{{ url_for('calculator', calc_id=cid) }}">{{ spec.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

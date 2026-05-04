@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}ChemEng Toolkit{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>ChemEng</h1>
+      <small>Engineering Calculators</small>
+    </div>
+
+    <ul class="nav">
+      <li>
+        <a href="{{ url_for('home') }}"
+           class="{{ 'active' if active == 'home' else '' }}">Home</a>
+      </li>
+    </ul>
+
+    {% for cat, items in groups %}
+      <div class="section">{{ cat }}</div>
+      <ul class="nav">
+        {% for cid, spec in items %}
+          <li>
+            <a href="{{ url_for('calculator', calc_id=cid) }}"
+               class="{{ 'active' if cid == active else '' }}">
+              {{ spec.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+
+    <div class="section">Assistant</div>
+    <ul class="nav">
+      <li>
+        <a href="{{ url_for('chatbot_page') }}"
+           class="{{ 'active' if active == 'chatbot' else '' }}">AI Chatbot</a>
+      </li>
+      <li>
+        <a href="{{ url_for('reports_page') }}"
+           class="{{ 'active' if active == 'reports' else '' }}">Reports</a>
+      </li>
+    </ul>
+  </aside>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/calc.js') }}"></script>
+</body>
+</html>

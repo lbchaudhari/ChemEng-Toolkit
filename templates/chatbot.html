@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}AI Chatbot – ChemEng Toolkit{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>ChemEng Assistant</h2>
+    <p>Ask about formulas or supply numbers for a quick calculation.</p>
+  </div>
+  <div class="meta">Rule-based</div>
+</div>
+
+<div class="chat-shell">
+  <div class="chat-log" id="chatLog">
+    <div class="bubble bot">
+      Hi! Try one of these:
+      <div class="suggestions">
+        <button>Reynolds with rho 1000 v 2 d 0.05 mu 0.001</button>
+        <button>LMTD Thi 150 Tho 90 Tci 30 Tco 70 counter</button>
+        <button>Ideal gas P 101325 V 0.024 n 1 T 0</button>
+        <button>Arrhenius A 1e10 Ea 75000 T 350</button>
+        <button>NPV rate 10 flows: -100000, 30000, 30000, 30000, 30000, 30000</button>
+        <button>Explain Fenske equation</button>
+        <button>What is LMTD?</button>
+      </div>
+    </div>
+  </div>
+  <form class="chat-input" id="chatForm" autocomplete="off">
+    <input id="chatBox" placeholder="Ask a chemical-engineering question..." />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<script>
+const log  = document.getElementById('chatLog');
+const form = document.getElementById('chatForm');
+const box  = document.getElementById('chatBox');
+
+function addUser(msg) {
+  const el = document.createElement('div');
+  el.className = 'bubble user';
+  el.textContent = msg;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+function addBot(payload) {
+  const el = document.createElement('div');
+  el.className = 'bubble bot';
+
+  const desc = document.createElement('div');
+  desc.textContent = payload.reply || '';
+  el.appendChild(desc);
+
+  if (payload.formula) {
+    const pre = document.createElement('pre');
+    pre.textContent = payload.formula;
+    el.appendChild(pre);
+  }
+
+  if (payload.results && payload.results.length) {
+    const tbl = document.createElement('table');
+    tbl.className = 'data';
+    const tbody = document.createElement('tbody');
+    payload.results.forEach(r => {
+      const tr = document.createElement('tr');
+      [r.label, r.value, r.unit || ''].forEach(v => {
+        const td = document.createElement('td'); td.textContent = v; tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    el.appendChild(tbl);
+  }
+
+  if (payload.calculator) {
+    const a = document.createElement('a');
+    a.href = '/calc/' + payload.calculator;
+    a.textContent = 'Open the full calculator →';
+    a.className = 'calc-link';
+    el.appendChild(a);
+  }
+
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function ask(msg) {
+  addUser(msg);
+  const r = await fetch('/api/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({message: msg}),
+  });
+  addBot(await r.json());
+}
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = box.value.trim();
+  if (!v) return;
+  box.value = '';
+  ask(v);
+});
+
+document.addEventListener('click', e => {
+  if (e.target.matches('.suggestions button')) {
+    ask(e.target.textContent);
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Reports – ChemEng Toolkit{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h2>PDF Reports</h2>
+    <p>Open any calculator, fill in your inputs, and click <strong>Download PDF Report</strong>
+       to get a formatted calculation sheet with inputs, results, and the formulas used.</p>
+  </div>
+  <div class="meta">PDF · ReportLab</div>
+</div>
+
+<div class="cat-grid">
+  {% for cat, items in groups %}
+    <div class="card">
+      <h3>{{ cat }}</h3>
+      <ul class="calc-list">
+        {% for cid, spec in items %}
+          <li>
+            <a href="{{ url_for('calculator', calc_id=cid) }}">{{ spec.title }}</a>
+            <span class="muted-inline"> – open to download report</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
